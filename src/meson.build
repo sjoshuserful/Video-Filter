@@ -17,5 +17,6 @@ gstcustomfilter = library('gstcustomfilter',
     '-DGST_USE_UNSTABLE_API'
   ],
   include_directories : inc,
-  install : true
+  install : true,
+  install_dir : 'usr/lib64/gstreamer-1.0'
 )

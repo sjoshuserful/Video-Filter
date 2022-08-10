@@ -24,8 +24,7 @@ dep_gst  = \
     , dependency('gstreamer-video-1.0',        include_type: 'system')
     ]
 
-data_install_dir = get_option('datadir') / meson.project_name()
-
+#data_install_dir = get_option('datadir') / meson.project_name()
 
 inc = include_directories('.')
 
