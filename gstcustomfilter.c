@@ -34,7 +34,7 @@
 #include "config.h"
 #endif
 
-#include <gst/gst.h>
+#include "gst/gst.h"
 #include <gst/video/video.h>
 #include <gst/video/gstvideofilter.h>
 #include "gstcustomfilter.h"
