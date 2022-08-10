@@ -58,23 +58,23 @@ static gboolean gst_customfilter_set_info (GstVideoFilter * filter, GstCaps * in
     GstVideoInfo * in_info, GstCaps * outcaps, GstVideoInfo * out_info);
 static GstFlowReturn gst_customfilter_transform_frame (GstVideoFilter * filter,
     GstVideoFrame * inframe, GstVideoFrame * outframe);
-static GstFlowReturn gst_customfilter_transform_frame_ip (GstVideoFilter * filter,
-    GstVideoFrame * frame);
+
 
 enum
 {
-  PROP_0
+  PROP_0,
+  PROP_FILTER_MODE
 };
 
 /* pad templates */
 
 /* FIXME: add/remove formats you can handle */
 #define VIDEO_SRC_CAPS \
-    GST_VIDEO_CAPS_MAKE("{ I420, Y444, Y42B, UYVY, RGBA }")
+    GST_VIDEO_CAPS_MAKE("{RGB}")
 
 /* FIXME: add/remove formats you can handle */
 #define VIDEO_SINK_CAPS \
-    GST_VIDEO_CAPS_MAKE("{ I420, Y444, Y42B, UYVY, RGBA }")
+    GST_VIDEO_CAPS_MAKE("{RGB}")
 
 
 /* class initialization */
@@ -100,8 +100,8 @@ gst_customfilter_class_init (GstCustomfilterClass * klass)
         gst_caps_from_string (VIDEO_SINK_CAPS)));
 
   gst_element_class_set_static_metadata (GST_ELEMENT_CLASS(klass),
-      "FIXME Long name", "Generic", "FIXME Description",
-      "FIXME <fixme@example.com>");
+      "Josh's Video Filter", "Filter", "Filter out certain color from streamed video",
+      "Josh Strand josh.strand@userful.com");
 
   gobject_class->set_property = gst_customfilter_set_property;
   gobject_class->get_property = gst_customfilter_get_property;
@@ -111,13 +111,19 @@ gst_customfilter_class_init (GstCustomfilterClass * klass)
   base_transform_class->stop = GST_DEBUG_FUNCPTR (gst_customfilter_stop);
   video_filter_class->set_info = GST_DEBUG_FUNCPTR (gst_customfilter_set_info);
   video_filter_class->transform_frame = GST_DEBUG_FUNCPTR (gst_customfilter_transform_frame);
-  video_filter_class->transform_frame_ip = GST_DEBUG_FUNCPTR (gst_customfilter_transform_frame_ip);
+  
+  g_object_class_install_property (gobject_class, PROP_FILTER_MODE,
+      g_param_spec_uint64 ("filter-mode", "Sets RGB filter",
+          "It will allow the selected RGB selection get filtered", 0,
+          3, 0, G_PARAM_WRITABLE | G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
 }
 
 static void
 gst_customfilter_init (GstCustomfilter *customfilter)
 {
+	GST_DEBUG_OBJECT (customfilter, "Initializing the element");
+	customfilter->filtermode = 0;
 }
 
 void
@@ -125,14 +131,29 @@ gst_customfilter_set_property (GObject * object, guint property_id,
     const GValue * value, GParamSpec * pspec)
 {
   GstCustomfilter *customfilter = GST_CUSTOMFILTER (object);
+  
+  // Set property according to property ID
+  switch(property_id) {
+	  case PROP_FILTER_MODE:
+		customfilter->filtermode = g_value_get_uint(value);
+		switch(customfilter->filtermode){
+			case 0:
+				break;
+			case 1:
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+		}
+		break;
+	  default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+		break;
+  }
 
   GST_DEBUG_OBJECT (customfilter, "set_property");
-
-  switch (property_id) {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-      break;
-  }
+  
 }
 
 void
@@ -142,11 +163,16 @@ gst_customfilter_get_property (GObject * object, guint property_id,
   GstCustomfilter *customfilter = GST_CUSTOMFILTER (object);
 
   GST_DEBUG_OBJECT (customfilter, "get_property");
-
+  
+  // Josh: is this lock necessary?
+  GST_OBJECT_LOCK (customfilter);
   switch (property_id) {
+	case PROP_FILTER_MODE:
+		g_value_set_uint(value, customfilter->filtermode);
+		break;
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-      break;
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+        break;
   }
 }
 
@@ -217,15 +243,6 @@ gst_customfilter_transform_frame (GstVideoFilter * filter, GstVideoFrame * infra
   return GST_FLOW_OK;
 }
 
-static GstFlowReturn
-gst_customfilter_transform_frame_ip (GstVideoFilter * filter, GstVideoFrame * frame)
-{
-  GstCustomfilter *customfilter = GST_CUSTOMFILTER (filter);
-
-  GST_DEBUG_OBJECT (customfilter, "transform_frame_ip");
-
-  return GST_FLOW_OK;
-}
 
 static gboolean
 plugin_init (GstPlugin * plugin)
@@ -242,21 +259,21 @@ plugin_init (GstPlugin * plugin)
    remove these, as they're always defined.  Otherwise, edit as
    appropriate for your external plugin package. */
 #ifndef VERSION
-#define VERSION "0.0.FIXME"
+#define VERSION "0.0.1"
 #endif
 #ifndef PACKAGE
-#define PACKAGE "FIXME_package"
+#define PACKAGE ""
 #endif
 #ifndef PACKAGE_NAME
-#define PACKAGE_NAME "FIXME_package_name"
+#define PACKAGE_NAME "Josh's GST Elements"
 #endif
 #ifndef GST_PACKAGE_ORIGIN
-#define GST_PACKAGE_ORIGIN "http://FIXME.org/"
+#define GST_PACKAGE_ORIGIN "http://userful.com"
 #endif
 
 GST_PLUGIN_DEFINE (GST_VERSION_MAJOR,
     GST_VERSION_MINOR,
     customfilter,
-    "FIXME plugin description",
+    "Element that filters specific colors from video",
     plugin_init, VERSION, "LGPL", PACKAGE_NAME, GST_PACKAGE_ORIGIN)
 

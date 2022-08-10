@@ -18,5 +18,5 @@ gstcustomfilter = library('gstcustomfilter',
   ],
   include_directories : inc,
   install : true,
-  install_dir : 'usr/lib64/gstreamer-1.0'
+  install_dir : '/usr/lib64/gstreamer-1.0'
 )
