@@ -240,8 +240,43 @@ gst_customfilter_transform_frame (GstVideoFilter * filter, GstVideoFrame * infra
     GstVideoFrame * outframe)
 {
   GstCustomfilter *customfilter = GST_CUSTOMFILTER (filter);
-
   GST_DEBUG_OBJECT (customfilter, "transform_frame");
+  
+  gst_video_frame_copy(outframe, inframe);
+  
+  /*guint *inPix, *outPix;
+  inPix = GST_VIDEO_FRAME_PLANE_DATA(inframe, 0);
+  outPix = GST_VIDEO_FRAME_PLANE_DATA(outframe, 0);
+  
+  guint video_size = GST_VIDEO_FRAME_WIDTH(inframe) * GST_VIDEO_FRAME_HEIGHT(inframe);
+  guint color[3];
+  for (guint i = 0; i < video_size; ++i) {
+	  //printf(*outPix);
+	  color[0] = 0;
+	  color[1] = 100;
+	  color[2] = 200;
+	  outPix = color;
+	  outPix++;*/ 
+  
+  //GstBuffer * video_buffer = outframe->buffer;
+  
+  //Josh: Is this gst_video_frame_map() function necessary?
+  //if (gst_video_frame_map (&outframe, video_info, video_buffer, GST_MAP_WRITE)) {
+     guint8 *pixels = GST_VIDEO_FRAME_PLANE_DATA (outframe, 0);
+     guint stride = GST_VIDEO_FRAME_PLANE_STRIDE (outframe, 0);
+     guint pixel_stride = GST_VIDEO_FRAME_COMP_PSTRIDE (outframe, 0);
+     
+     guint height = GST_VIDEO_FRAME_HEIGHT(outframe);
+	 guint width = GST_VIDEO_FRAME_WIDTH(outframe);
+     for (guint h = 0; h < height; ++h) {
+       for (guint w = 0; w < width; ++w) {
+         guint8 *pixel = pixels + h * stride + w * pixel_stride;
+
+         memset (pixel, 0, pixel_stride);
+       }
+     }
+
+   //}
 
   return GST_FLOW_OK;
 }
