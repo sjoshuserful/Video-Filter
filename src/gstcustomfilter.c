@@ -136,17 +136,6 @@ gst_customfilter_set_property (GObject * object, guint property_id,
   switch(property_id) {
 	  case PROP_FILTER_MODE:
 		customfilter->filtermode = g_value_get_uint(value);
-// unnecessery code
-/*		switch(customfilter->filtermode){
-			case 0:
-				break;
-			case 1:
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
-		}*/
 		break;
 	  default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -268,14 +257,33 @@ gst_customfilter_transform_frame (GstVideoFilter * filter, GstVideoFrame * infra
      
      guint height = GST_VIDEO_FRAME_HEIGHT(outframe);
 	 guint width = GST_VIDEO_FRAME_WIDTH(outframe);
-     for (guint h = 0; h < height; ++h) {
-       for (guint w = 0; w < width; ++w) {
-         guint8 *pixel = pixels + h * stride + w * pixel_stride;
-
-         memset (pixel, 0, pixel_stride);
-       }
-     }
-
+	 if (PROP_FILTER_MODE) {
+		for (guint h = 0; h < height; ++h) {
+			for (guint w = 0; w < width; ++w) {
+				guint8 *pixel = pixels + h * stride + w * pixel_stride;
+				
+				//red
+				if (customfilter->filtermode == 1) {
+					memset(pixel, 0, 1);
+				}
+				else {memset(pixel, *pixel, 1);}
+				pixel++;
+				
+				// green
+				if (customfilter->filtermode == 2) {
+					memset(pixel, 0, 1);
+				}
+				else {memset(pixel, *pixel, 1);}
+				pixel++;
+				
+				//blue
+				if (customfilter->filtermode == 3) {
+					memset(pixel, 0, 1);
+				}
+				else {memset(pixel, *pixel, 1);}
+			}
+		}
+	}
    //}
 
   return GST_FLOW_OK;
