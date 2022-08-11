@@ -37,7 +37,7 @@ typedef struct _GstCustomfilterClass GstCustomfilterClass;
 struct _GstCustomfilter
 {
   GstVideoFilter base_customfilter;
-  guint64 filtermode;
+  guint filtermode;
 
 };
 

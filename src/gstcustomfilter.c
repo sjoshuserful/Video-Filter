@@ -113,9 +113,9 @@ gst_customfilter_class_init (GstCustomfilterClass * klass)
   video_filter_class->transform_frame = GST_DEBUG_FUNCPTR (gst_customfilter_transform_frame);
   
   g_object_class_install_property (gobject_class, PROP_FILTER_MODE,
-      g_param_spec_uint64 ("filter-mode", "Sets RGB filter",
+      g_param_spec_uint ("filter-mode", "Sets RGB filter",
           "It will allow the selected RGB selection get filtered", 0,
-          3, 0, G_PARAM_WRITABLE | G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+          3, 0, G_PARAM_READWRITE));
 
 }
 
@@ -136,7 +136,8 @@ gst_customfilter_set_property (GObject * object, guint property_id,
   switch(property_id) {
 	  case PROP_FILTER_MODE:
 		customfilter->filtermode = g_value_get_uint(value);
-		switch(customfilter->filtermode){
+// unnecessery code
+/*		switch(customfilter->filtermode){
 			case 0:
 				break;
 			case 1:
@@ -145,7 +146,7 @@ gst_customfilter_set_property (GObject * object, guint property_id,
 				break;
 			case 3:
 				break;
-		}
+		}*/
 		break;
 	  default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -165,7 +166,9 @@ gst_customfilter_get_property (GObject * object, guint property_id,
   GST_DEBUG_OBJECT (customfilter, "get_property");
   
   // Josh: is this lock necessary?
-  GST_OBJECT_LOCK (customfilter);
+  // I doubt it's necessery, it depends on your element and if changing values dynamically can break the code while it's running
+  // Also you're creating a deadlock by no unlocking it
+  //GST_OBJECT_LOCK (customfilter);
   switch (property_id) {
 	case PROP_FILTER_MODE:
 		g_value_set_uint(value, customfilter->filtermode);
