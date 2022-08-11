@@ -100,7 +100,7 @@ gst_customfilter_class_init (GstCustomfilterClass * klass)
         gst_caps_from_string (VIDEO_SINK_CAPS)));
 
   gst_element_class_set_static_metadata (GST_ELEMENT_CLASS(klass),
-      "Josh's Video Filter", "Filter", "Filter out certain color from streamed video",
+      "Josh's Video Filter", "Filter/Effect/Video", "Filter out certain color from streamed video",
       "Josh Strand josh.strand@userful.com");
 
   gobject_class->set_property = gst_customfilter_set_property;
@@ -262,10 +262,10 @@ plugin_init (GstPlugin * plugin)
 #define VERSION "0.0.1"
 #endif
 #ifndef PACKAGE
-#define PACKAGE ""
+#define PACKAGE "JGSTE"
 #endif
 #ifndef PACKAGE_NAME
-#define PACKAGE_NAME "Josh's GST Elements"
+#define PACKAGE_NAME "Josh"
 #endif
 #ifndef GST_PACKAGE_ORIGIN
 #define GST_PACKAGE_ORIGIN "http://userful.com"
