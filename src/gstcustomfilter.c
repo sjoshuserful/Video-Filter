@@ -114,7 +114,8 @@ gst_customfilter_class_init (GstCustomfilterClass * klass)
   
   g_object_class_install_property (gobject_class, PROP_FILTER_MODE,
       g_param_spec_uint ("filter-mode", "Sets RGB filter",
-          "It will allow the selected RGB selection get filtered", 0,
+          "Filters R,G,B. filter-mode=0: no filter, filter-mode=1: filter red, \
+          filter-mode=2: filter green, filter-mode=3: filter blue", 0,
           3, 0, G_PARAM_READWRITE));
 
 }
@@ -154,10 +155,6 @@ gst_customfilter_get_property (GObject * object, guint property_id,
 
   GST_DEBUG_OBJECT (customfilter, "get_property");
   
-  // Josh: is this lock necessary?
-  // I doubt it's necessery, it depends on your element and if changing values dynamically can break the code while it's running
-  // Also you're creating a deadlock by no unlocking it
-  //GST_OBJECT_LOCK (customfilter);
   switch (property_id) {
 	case PROP_FILTER_MODE:
 		g_value_set_uint(value, customfilter->filtermode);
@@ -233,35 +230,20 @@ gst_customfilter_transform_frame (GstVideoFilter * filter, GstVideoFrame * infra
   
   gst_video_frame_copy(outframe, inframe);
   
-  /*guint *inPix, *outPix;
-  inPix = GST_VIDEO_FRAME_PLANE_DATA(inframe, 0);
-  outPix = GST_VIDEO_FRAME_PLANE_DATA(outframe, 0);
-  
-  guint video_size = GST_VIDEO_FRAME_WIDTH(inframe) * GST_VIDEO_FRAME_HEIGHT(inframe);
-  guint color[3];
-  for (guint i = 0; i < video_size; ++i) {
-	  //printf(*outPix);
-	  color[0] = 0;
-	  color[1] = 100;
-	  color[2] = 200;
-	  outPix = color;
-	  outPix++;*/ 
-  
-  //GstBuffer * video_buffer = outframe->buffer;
-  
-  //Josh: Is this gst_video_frame_map() function necessary?
-  //if (gst_video_frame_map (&outframe, video_info, video_buffer, GST_MAP_WRITE)) {
-     guint8 *pixels = GST_VIDEO_FRAME_PLANE_DATA (outframe, 0);
-     guint stride = GST_VIDEO_FRAME_PLANE_STRIDE (outframe, 0);
-     guint pixel_stride = GST_VIDEO_FRAME_COMP_PSTRIDE (outframe, 0);
+  guint8 *pixels = GST_VIDEO_FRAME_PLANE_DATA (outframe, 0);
+  guint stride = GST_VIDEO_FRAME_PLANE_STRIDE (outframe, 0);
+  guint pixel_stride = GST_VIDEO_FRAME_COMP_PSTRIDE (outframe, 0);
      
-     guint height = GST_VIDEO_FRAME_HEIGHT(outframe);
-	 guint width = GST_VIDEO_FRAME_WIDTH(outframe);
+  guint height = GST_VIDEO_FRAME_HEIGHT(outframe);
+  guint width = GST_VIDEO_FRAME_WIDTH(outframe);
+  
 	 if (PROP_FILTER_MODE) {
 		for (guint h = 0; h < height; ++h) {
 			for (guint w = 0; w < width; ++w) {
 				guint8 *pixel = pixels + h * stride + w * pixel_stride;
-				
+				// filter-mode == 1: Filter the red
+				// filter-mode == 2: Filter the green
+				// filter-mode == 3: Filter the blue
 				//red
 				if (customfilter->filtermode == 1) {
 					memset(pixel, 0, 1);
